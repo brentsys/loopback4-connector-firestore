@@ -1,9 +1,9 @@
 {
-	"name": "loopback4-connector-firestore",
+	"name": "loopback4-connector-firestore-gcp",
 	"version": "1.0.9",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
-	"description": "Firebase Firestore connector for the LoopBack framework.",
+	"description": "Firebase Firestore connector for the LoopBack framework running on GCP.",
 	"scripts": {
 		"lint": "eslint . --fix --ext .ts,.js",
 		"typecheck": "tsc --project tsconfig.json",
@@ -52,8 +52,9 @@
 		"firestore",
 		"firebase"
 	],
-	"author": "Bui Dinh Ngoc <buidinhngoc.aiti@gmail.com> (https://github.com/ngocbd)",
+	"author": "Alec Markkü <dev@brentsys.com> (https://github.com/brentsys)",
 	"license": "MIT",
-	"bugs": "https://github.com/ngocbd/loopback4-connector-firestore/issues",
-	"homepage": "https://github.com/ngocbd/loopback4-connector-firestore"
+	"bugs": "https://github.com/brentsys/loopback4-connector-firestore/issues",
+	"homepage": "https://github.com/brentsys/loopback4-connector-firestore",
+	"fork": "https://github.com/ngocbd/loopback4-connector-firestore"
 }

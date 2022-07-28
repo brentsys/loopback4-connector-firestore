@@ -6,7 +6,7 @@ const operators: { [key: string]: WhereFilterOp } = {
 	gt: '>',
 	gte: '>=',
 	in: 'in',
-	eq: '=='
+	eq: '==',
 };
 
 export default Object.freeze(operators);
