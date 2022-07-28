@@ -1,4 +1,5 @@
 module.exports = require('should');
+require('dotenv').config();
 
 const { DataSource } = require('loopback-datasource-juggler');
 const lib = require('./../dist/firestore');
@@ -33,6 +34,5 @@ global.getDataSource = global.getSchema = customConfig => {
 	db.log = a => {
 		console.log(a);
 	};
-
 	return db;
 };

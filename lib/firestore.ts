@@ -1,4 +1,6 @@
 import { Connector } from 'loopback-connector';
+import { initializeApp, applicationDefault, cert, Credential } from 'firebase-admin/app'
+import { getFirestore } from 'firebase-admin/firestore'
 import {
 	QuerySnapshot,
 	Firestore as Admin,
@@ -28,17 +30,13 @@ class Firestore extends Connector {
 		super();
 		this._models = {};
 
-		const { projectId, clientEmail, privateKey } = dataSourceProps;
-		
-		const firestore = new Admin({
-			credentials: {
-				private_key: privateKey, // eslint-disable-line camelcase
-				client_email: clientEmail // eslint-disable-line camelcase
-			},
-			projectId
-		});
+		const { projectId, clientEmail, privateKey, serviceAccount } = dataSourceProps;
 
-		this.db = firestore;
+		const credentials: Credential = !serviceAccount ? applicationDefault() : cert(serviceAccount)
+
+		initializeApp({ credential: credentials })
+
+		this.db = getFirestore();
 	}
 
 	/**
@@ -69,7 +67,7 @@ class Firestore extends Connector {
 
 			callback(null, result);
 		} catch (error) {
-			callback(null,error);
+			callback(null, error);
 		}
 	};
 
@@ -428,7 +426,6 @@ class Firestore extends Connector {
 		try {
 			const collectionRef = this.db.collection(model);
 			const snapshots = await collectionRef.get();
-
 			if (snapshots.empty || snapshots.size === 0) return Promise.resolve([]);
 
 			const result = this.completeDocumentResults(snapshots.docs);

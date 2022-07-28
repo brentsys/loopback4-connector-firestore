@@ -28,7 +28,8 @@ You should fill the application's datasource file which is located in `/server/d
   "projectId": "",
   "clientEmail":  "",
   "privateKey": "",
-  "databaseName": "Optional, Default: projectId"
+  "databaseName": "Optional, Default: projectId",
+  "serviceAccount": "Optional"
 }
 ```
 
@@ -40,8 +41,12 @@ You should fill the application's datasource file which is located in `/server/d
 | clientEmail | String | client_email in the JSON file | --- |
 | privateKey | String | private_key in the JSON file | --- |
 | databaseName | String | Firebase's project id | Optional, Default: projectId | --- |
+| serviceAccount | String | Local path to service Account | Optional, Default: undefined | --- |
 
 And you can actually store those private details as an Environment variables, Check [source-configuration][8]
+
+#### on server side
+set [GOOGLE_APPLICATION_CREDENTIALS](https://firebase.google.com/docs/admin/setup) environment variable
 
 
 ### Build and test from source
