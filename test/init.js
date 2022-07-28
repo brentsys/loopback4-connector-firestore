@@ -4,34 +4,32 @@ require('dotenv').config();
 const { DataSource } = require('loopback-datasource-juggler');
 const lib = require('./../dist/firestore');
 
-let {
+const {
 	firestore_projectId: projectId,
 	firestore_clientEmail: clientEmail,
-	firestore_privateKey: privateKey
+	firestore_privateKey: privateKey,
 } = process.env;
-
 
 let config;
 config = {
 	projectId,
 	clientEmail,
-	privateKey: privateKey
+	privateKey: privateKey,
 };
 if (projectId) {
 	config = {
 		projectId,
 		clientEmail,
-		privateKey: privateKey.replace(/\\n/g, '\n')
+		privateKey: privateKey.replace(/\\n/g, '\n'),
 	};
-	
 }
 
 global.config = config;
 console.log(config);
-global.getDataSource = global.getSchema = customConfig => {
+global.getDataSource = global.getSchema = (customConfig) => {
 	const db = new DataSource(lib, customConfig || config);
 
-	db.log = a => {
+	db.log = (a) => {
 		console.log(a);
 	};
 	return db;

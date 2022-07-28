@@ -1,13 +1,18 @@
 import { Connector } from 'loopback-connector';
-import { initializeApp, applicationDefault, cert, Credential } from 'firebase-admin/app'
-import { getFirestore } from 'firebase-admin/firestore'
+import {
+	initializeApp,
+	applicationDefault,
+	cert,
+	Credential,
+} from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 import {
 	QuerySnapshot,
 	Firestore as Admin,
 	Query,
 	DocumentSnapshot,
 	QueryDocumentSnapshot,
-	DocumentReference
+	DocumentReference,
 } from '@google-cloud/firestore';
 import { IFilter, IDataSource, ICallback } from './interfaces';
 import { operators } from './config';
@@ -30,11 +35,14 @@ class Firestore extends Connector {
 		super();
 		this._models = {};
 
-		const { projectId, clientEmail, privateKey, serviceAccount } = dataSourceProps;
+		const { projectId, clientEmail, privateKey, serviceAccount } =
+			dataSourceProps;
 
-		const credentials: Credential = !serviceAccount ? applicationDefault() : cert(serviceAccount)
+		const credentials: Credential = !serviceAccount
+			? applicationDefault()
+			: cert(serviceAccount);
 
-		initializeApp({ credential: credentials })
+		initializeApp({ credential: credentials });
 
 		this.db = getFirestore();
 	}
@@ -187,6 +195,7 @@ class Firestore extends Connector {
 		this.exists(model, id, null, (err, res: boolean) => {
 			if (err) callback(err);
 			if (res) {
+				delete data.id;
 				self.db
 					.collection(model)
 					.doc(id)
@@ -292,7 +301,7 @@ class Firestore extends Connector {
 				.then(() => {
 					callback(null, '');
 				})
-				.catch(err => callback(err));
+				.catch((err) => callback(err));
 		}
 	};
 
@@ -305,7 +314,7 @@ class Firestore extends Connector {
 	) => {
 		query
 			.get()
-			.then(snapshot => {
+			.then((snapshot) => {
 				// When there are no documents left, we are done
 				if (snapshot.size == 0) {
 					return 0;
@@ -313,11 +322,11 @@ class Firestore extends Connector {
 
 				// Delete documents in a batch
 				const batch = db.batch();
-				snapshot.docs.forEach(doc => batch.delete(doc.ref));
+				snapshot.docs.forEach((doc) => batch.delete(doc.ref));
 
 				return batch.commit().then(() => snapshot.size);
 			})
-			.then(numDeleted => {
+			.then((numDeleted) => {
 				if (numDeleted === 0) {
 					resolve();
 					return;
@@ -333,11 +342,35 @@ class Firestore extends Connector {
 	};
 
 	public create = (model: string, data: any, callback: ICallback) => {
+		const { id } = data;
+		if (!id) {
+			this.db
+				.collection(model)
+				.add(data)
+				.then((ref: DocumentReference) => {
+					callback(null, ref.id);
+				})
+				.catch((err: Error) => {
+					callback(err);
+				});
+		} else {
+			delete data.id;
+			this.createWithId(model, `${id}`, data, callback);
+		}
+	};
+
+	private createWithId = (
+		model: string,
+		id: string,
+		data: any,
+		callback: ICallback
+	) => {
 		this.db
 			.collection(model)
-			.add(data)
-			.then((ref: DocumentReference) => {
-				callback(null, ref.id);
+			.doc(id)
+			.set(data)
+			.then((_: any) => {
+				callback(null, id);
 			})
 			.catch((err: Error) => {
 				callback(err);
@@ -378,10 +411,10 @@ class Firestore extends Connector {
 	) => {
 		const results: any[] = [];
 
-		snapshots.forEach(item =>
+		snapshots.forEach((item) =>
 			results.push({
 				id: item.id,
-				...item.data()
+				...item.data(),
 			})
 		);
 
@@ -404,10 +437,7 @@ class Firestore extends Connector {
 	 */
 	private findById = async (model: string, id: string) => {
 		try {
-			const documentSnapshot = await this.db
-				.collection(model)
-				.doc(id)
-				.get();
+			const documentSnapshot = await this.db.collection(model).doc(id).get();
 			if (!documentSnapshot.exists) return Promise.resolve([]);
 
 			const result = { id: documentSnapshot.id, ...documentSnapshot.data() };
